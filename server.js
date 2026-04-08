@@ -10,5 +10,4 @@ app.use(express.json());
 app.use('/students', studentsRoutes);
 app.use('/attendance', attendanceRoutes);
 
-app.listen(5005, () => console.log('Server running on http://localhost:5000'));
-
+app.listen(5005, () => console.log('Server running on http://localhost:5005'));
