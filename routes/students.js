@@ -13,6 +13,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post('/', async (req, res) => {
+  const { full_name, phone, parent_phone, birthday, admission_day, email } = req.body;
+
+  if (!full_name || !phone) {
+    return res.status(400).json({ message: 'Full name and phone are required' });
+  }
+
+  try {
+    const query = `
+      INSERT INTO students (full_name, phone, parent_phone, birthday, admission_day, email)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *;
+    `;
+
+    const values = [full_name, phone, parent_phone, birthday, admission_day, email];
+
+    const result = await pool.query(query, values);
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('DB INSERT ERROR:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 router.delete('/:id', async (req, res) => {
   console.log('DELETED');
   const { id } = req.params;
