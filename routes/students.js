@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM students;');
+    const result = await pool.query('SELECT * FROM students ORDER BY group_id ASC, id ASC;');
     res.json(result.rows);
   } catch (err) {
     console.error('DB ERROR:', err);
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { full_name, phone, parent_phone, birthday, admission_day, email } = req.body;
+  const { full_name, phone, parent_phone, birthday, admission_day, email, group_id } = req.body;
 
   if (!full_name || !phone) {
     return res.status(400).json({ message: 'Full name and phone are required' });
@@ -22,16 +22,17 @@ router.post('/', async (req, res) => {
 
   try {
     const query = `
-      INSERT INTO students (full_name, phone, parent_phone, birthday, admission_day, email)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO students (full_name, phone, parent_phone, birthday, admission_day, email, group_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *;
     `;
 
-    const values = [full_name, phone, parent_phone, birthday, admission_day, email];
+    const values = [full_name, phone, parent_phone, birthday, admission_day, email, group_id];
 
     const result = await pool.query(query, values);
 
     res.status(201).json(result.rows[0]);
+    console.log('ADDED');
   } catch (err) {
     console.error('DB INSERT ERROR:', err);
     res.status(500).json({ message: 'Server error' });
